@@ -52,6 +52,10 @@ class Card
   def <=>(other_card)
     VALID_RANKS.index(card_string) <=> VALID_RANKS.index(other_card.card_string)
   end
+
+  def ==(other_card)
+    card_string == other_card.card_string
+  end
 end
 
 class Suit
@@ -75,12 +79,22 @@ class Hand
   end
 
   def best_hand
-    if kind = four_of_a_kind?
+    if kind = royal_flush?
+      "Royal Flush (#{kind} high)"
+    elsif kind = straight_flush?
+      "Straight Flush (#{kind} high)"
+    elsif kind = four_of_a_kind?
       "Four of a Kind (#{kind} high)"
+    elsif kind = full_house?
+      "Full House (#{kind} high)"
+    elsif kind = flush?
+      "Flush (#{kind} high)"
+    elsif kind = straight?
+      "Straight (#{kind} high)"
     elsif kind = three_of_a_kind?
       "Three of a Kind (#{kind} high)"
     elsif pair = two_pair?
-      "Two Pair (#{pair} high)"
+      "Two Pair (#{pair.first.first.card_string} high)"
     elsif kind = two_of_a_kind?
       "Two of a Kind (#{kind} high)"
     else
@@ -92,29 +106,74 @@ class Hand
     @cards.sort.last
   end
 
+  def full_house?
+    two_of_a_kind? && three_of_a_kind?
+  end
+
   def two_pair?
-    kinds = {}
+    pairs if pairs.count >= 2
+  end
 
-    @cards.sort.reverse.each do |card|
-      kinds[card.card_string] ||= []
-      kinds[card.card_string] << card
+  def straight_flush?
+    if straight? && flush? && straight? == flush?
+      flush?
+    end
+  end
 
-      if kinds[card.card_string].count == 2
-        return card.card_string
+  def royal_flush?
+    if straight? && flush? && straight? == flush? && straight?.card_string == 'A'
+      straight?
+    end
+  end
+
+  def straight?
+    sorted = @cards.sort
+
+    if check_straight(sorted[2..6])
+      sorted[6]
+    elsif check_straight(sorted[1..5])
+      sorted[5]
+    elsif check_straight(sorted[0..4])
+      sorted[4]
+    end
+  end
+
+  def flush?
+    cards_by_suit.keys.each do |suit|
+      if cards_by_suit[suit].count >= 5
+        return cards_by_suit[suit].sort.reverse.first
       end
     end
 
     false
   end
 
-  def two_of_a_kind?
-    kinds = {}
+  def check_straight(five_cards)
+    index = Card::VALID_RANKS.index(five_cards.first.to_s)
 
-    @cards.each do |card|
-      kinds[card.card_string] ||= []
-      kinds[card.card_string] << card
+    if index + 4 > Card::VALID_RANKS.length
+      return false
     end
 
+    things = Card::VALID_RANKS[index..(index+4)]
+
+    five_cards = five_cards.map(&:to_s)
+    five_cards == things
+  end
+
+  def pairs
+    return @pairs if @pairs
+
+    @pairs = []
+
+    kinds.keys.each do |kind|
+      @pairs << kinds[kind] if kinds[kind].count >= 2
+    end
+
+    @pairs
+  end
+
+  def two_of_a_kind?
     kinds.keys.each do |kind|
       if kinds[kind].count == 2
         return kind
@@ -125,13 +184,6 @@ class Hand
   end
 
   def three_of_a_kind?
-    kinds = {}
-
-    @cards.each do |card|
-      kinds[card.card_string] ||= []
-      kinds[card.card_string] << card
-    end
-
     kinds.keys.each do |kind|
       if kinds[kind].count == 3
         return kind
@@ -142,13 +194,6 @@ class Hand
   end
 
   def four_of_a_kind?
-    kinds = {}
-
-    @cards.each do |card|
-      kinds[card.card_string] ||= []
-      kinds[card.card_string] << card
-    end
-
     kinds.keys.each do |kind|
       if kinds[kind].count == 4
         return kind
@@ -156,6 +201,32 @@ class Hand
     end
 
     false
+  end
+
+  def kinds
+    return @kinds if @kinds
+
+    @kinds = {}
+
+    @cards.sort.reverse.each do |card|
+      @kinds[card.card_string] ||= []
+      @kinds[card.card_string] << card
+    end
+
+    @kinds
+  end
+
+  def cards_by_suit
+    return @cards_by_suit if @cards_by_suit
+
+    @cards_by_suit = {}
+
+    @cards.sort.reverse.each do |card|
+      @cards_by_suit[card.suit] ||= []
+      @cards_by_suit[card.suit] << card
+    end
+
+    @cards_by_suit
   end
 end
 

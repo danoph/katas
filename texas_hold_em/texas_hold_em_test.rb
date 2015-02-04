@@ -122,7 +122,7 @@ class TexasHoldEmTest < Minitest::Test
 
   def test_pick_two_pair
     cards = "4C 7D QH 3S 7H 10H QS"
-    assert_equal "Two Pair (Q high)", TexasHoldEm.new(cards).best_hand
+    assert_equal "Two Pair (Q high)", TexasHoldEm.new(cards).best_hand, "Two Pair (Q high) - #{cards}"
   end
 
   #################
@@ -133,7 +133,8 @@ class TexasHoldEmTest < Minitest::Test
 
   def test_pick_two_of_a_kind
     cards = "4C 7D 2H 3S JD 10H 7S"
-    assert_equal "Two of a Kind (7 high)", TexasHoldEm.new(cards).best_hand
+    puts "\ncards: #{cards}\n"
+    assert_equal "Two of a Kind (7 high)", TexasHoldEm.new(cards).best_hand, "Two of a Kind (7 high) #{cards}"
   end
 
   #############
