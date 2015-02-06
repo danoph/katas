@@ -89,7 +89,7 @@ class TexasHoldEmTest < Minitest::Test
 
   def test_flush_beats_straight
     cards = "2D 4D 6D 7C 8C 9D 10D"
-    assert_equal "Flush (10 high)", TexasHoldEm.new(cards).best_hand
+    assert_equal "Flush (10 high)", TexasHoldEm.new(cards).best_hand, "Flush (10 high), #{cards}"
   end
 
   ############

@@ -54,7 +54,7 @@ class Card
   end
 
   def ==(other_card)
-    card_string == other_card.card_string
+    card_string == other_card.card_string if other_card
   end
 end
 
@@ -115,7 +115,7 @@ class Hand
   end
 
   def straight_flush?
-    if straight? && flush? && straight? == flush?
+    if straight? && flush? && straight.map { |x| x.suit}.uniq.length == 1
       flush?
     end
   end
@@ -126,16 +126,22 @@ class Hand
     end
   end
 
-  def straight?
-    sorted = @cards.sort
+  def straight
+    @straight ||= begin
+      sorted = @cards.sort
 
-    if check_straight(sorted[2..6])
-      sorted[6]
-    elsif check_straight(sorted[1..5])
-      sorted[5]
-    elsif check_straight(sorted[0..4])
-      sorted[4]
+      if check_straight(sorted[2..6])
+        sorted[2..6]
+      elsif check_straight(sorted[1..5])
+        sorted[1..5]
+      elsif check_straight(sorted[0..4])
+        sorted[0..4]
+      end
     end
+  end
+
+  def straight?
+    straight.last if straight
   end
 
   def flush?
