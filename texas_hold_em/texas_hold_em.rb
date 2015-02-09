@@ -73,12 +73,103 @@ class Suit
   end
 end
 
+class StraightMatcher
+  def matches?(cards)
+    @straight ||= begin
+      sorted = @cards.sort
+
+      if check_straight(sorted[2..6])
+        sorted[2..6]
+      elsif check_straight(sorted[1..5])
+        sorted[1..5]
+      elsif check_straight(sorted[0..4])
+        sorted[0..4]
+      end
+    end
+  end
+
+  def straight
+    @straight
+  end
+end
+
+class FlushMatcher
+  def matches?(cards)
+    cards_by_suit.keys.each do |suit|
+      if cards_by_suit[suit].count >= 5
+        return cards_by_suit[suit].sort.reverse.first
+      end
+    end
+
+    false
+  end
+end
+
+class StraightFlushMatcher
+  def initialize()
+    @straight_matcher = StraightMatcher.new
+    @flush_matcher = FlushMatcher.new
+  end
+
+  def matches?(cards)
+    if straight? && flush? && straight.map { |x| x.suit}.uniq.length == 1
+      flush?
+    end
+  end
+end
+
+class RoyalFlushMatcher
+  def initialize
+    @straight_flush_matcher = StraightFlushMatcher.new
+  end
+
+  def matches?(cards)
+    @straight_flush_matcher.matches?(cards)
+
+    if straight? && flush? && straight? == flush? && straight?.card_string == 'A'
+      straight?
+    end
+  end
+end
+
 class Hand
+end
+
+class HighCard < Hand
+  def initialize(card)
+    @card = card
+  end
+
+  def to_s
+    "High Card (#{@card} high)"
+  end
+end
+
+class Hands
   def initialize(cards)
     @cards = cards
   end
 
   def best_hand
+    hands = []
+
+    #hands << RoyalFlush.new(self) if royal_flush?
+    #hands << StraightFlush.new(self) if straight_flush?
+    #hands << FourOfAKind.new(self) if four_of_a_kind?
+
+    #hands.sort.first
+
+    #hands = [
+      #RoyalFlush.new(cards),
+      #StraightFlush.new(cards),
+      #FourOfAKind.new(cards),
+      #FullHouse.new(cards),
+      #Straight.new(cards),
+      #ThreeOfAKind.new(cards),
+      #TwoPair.new(cards),
+      #TwoOfAKind.new(cards)
+    #].compact.sort.first
+
     if kind = royal_flush?
       "Royal Flush (#{kind} high)"
     elsif kind = straight_flush?
@@ -98,7 +189,7 @@ class Hand
     elsif kind = two_of_a_kind?
       "Two of a Kind (#{kind} high)"
     else
-      "High Card (#{high_card} high)"
+      HighCard.new(@cards.sort.last).to_s
     end
   end
 
@@ -115,9 +206,6 @@ class Hand
   end
 
   def straight_flush?
-    if straight? && flush? && straight.map { |x| x.suit}.uniq.length == 1
-      flush?
-    end
   end
 
   def royal_flush?
@@ -240,7 +328,7 @@ class TexasHoldEm
   def initialize(cards)
     @cards = CardsBuilder.new(cards).cards
     raise ArgumentError.new unless @cards.count == 7
-    @hand = Hand.new(@cards)
+    @hand = Hands.new(@cards)
   end
 
   def best_hand
