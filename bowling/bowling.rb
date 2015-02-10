@@ -7,52 +7,88 @@ class Bowling
   class TooManyPins   < StandardError; end
 
   def initialize(throws)
-    @frame_number = 1
-    @frames = []
-    throws = throws.split('')
+    @throws = throws.split('')
+    play_game
+  end
 
-    @balls = []
+  def play_game
+    balls = []
 
-    frame = Frame.new(@frame_number)
-
-    throws.each do |bowling_throw|
+    @throws.each do |bowling_throw|
       case bowling_throw
       when 'X'
         ball = Strike.new
-        frame.open = true
       when '-'
         ball = GutterBall.new
       when '/'
         ball = Spare.new
-        frame.open = true
       else
         ball = NormalBall.new(bowling_throw)
       end
 
-      @balls << ball
+      balls << ball
+    end
 
+    @game = Game.new(balls)
+    @game.play
+  end
+
+  def score
+    @game.score
+  end
+end
+
+class Game
+  def initialize(balls, frame_scorer = FrameScorer.new)
+    @balls = balls
+    @frame_scorer = frame_scorer
+    @frame_number = 0
+  end
+
+  def play
+    frame = new_frame
+
+    @balls.each do |ball|
       ball.frame = frame
 
       frame.add_throw(ball)
 
       if frame.finished?
-        @frames << frame
-        @frame_number += 1
-
-        frame = Frame.new @frame_number
+        @frame_scorer.add_frame(frame)
+        frame = new_frame
       end
     end
   end
 
+  def new_frame
+    @frame_number += 1
+    Frame.new @frame_number
+  end
+
   def score
-    ball_scorer = BallScorer.new(@balls)
-    @score = ball_scorer.score_balls
+    @frame_scorer.score_frames
+  end
+end
+
+class FrameScorer
+  def initialize
+    @frames = []
+  end
+
+  def add_frame(frame)
+    @frames << frame
+  end
+
+  def score_frames
+    #ball_scorer = BallScorer.new(@frames.map(&:balls).flatten)
+    #@score = ball_scorer.score_balls
+    @score = 0
 
     @frames.each do |frame|
       puts "frame: #{frame.number}"
 
-      frame.balls.each do |ball|
-        puts "\tball: #{ball} - score: #{ball.score}"
+      frame.balls.each_with_index do |ball, index|
+        puts "\tball #{index + 1}: #{ball.ball_str} - score: #{ball.score}"
       end
     end
 
@@ -60,10 +96,6 @@ class Bowling
     puts "\t#{@score}"
 
     @score
-
-    #@balls.each do |ball|
-      #puts "ball: #{ball} - score: #{ball.score}"
-    #end
   end
 end
 
@@ -96,16 +128,10 @@ class BallScorer
 
       @scores << ball.score
 
-      puts "any open frames: #{any_open_frames?}"
-
       puts "ball #{throw_number} - score: #{ball.score}"
     end
 
     @scores.inject(0, &:+)
-  end
-
-  def any_open_frames?
-    @balls.detect{|ball| !ball.closed_frame? }
   end
 end
 
@@ -126,8 +152,8 @@ class Ball
     !frame.open?
   end
 
-  def close_frame
-    frame.close
+  def close_frame!
+    frame.close!
   end
 end
 
@@ -172,7 +198,7 @@ class Frame
   def initialize(number)
     @number = number
     @balls = []
-    @open = false
+    @open = true
   end
 
   def add_throw(ball)
@@ -191,7 +217,7 @@ class Frame
     !!@open
   end
 
-  def close
+  def close!
     @open = false
   end
 end
