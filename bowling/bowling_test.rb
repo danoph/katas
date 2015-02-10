@@ -41,31 +41,31 @@ class BowlingTest < Minitest::Test
   #####################
 
   def test_not_enough_strikes_throws_an_exception
-    assert_raise(Bowling::GameTooShort, "Should not accept an invalid game") do
+    assert_raises(Bowling::GameTooShort, "Should not accept an invalid game") do
       Bowling.new("X" * 10)
     end
   end
 
   def test_bad_spare_throws_an_exception
-    assert_raise(Bowling::SpareTooEarly, "Should not allow a spare at the start of a frame") do
+    assert_raises(Bowling::SpareTooEarly, "Should not allow a spare at the start of a frame") do
       Bowling.new("/" + "-" * 19)
     end
   end
 
   def test_too_many_throws_throws_an_exception
-    assert_raise(Bowling::GameTooLong, "Should not accept a game that is too long") do
+    assert_raises(Bowling::GameTooLong, "Should not accept a game that is too long") do
       Bowling.new("4" * 21)
     end
   end
 
   def test_knocking_down_10_pins_requires_a_spare
-    assert_raise(Bowling::TooManyPins, "Knocking down 10 pins requires a spare") do
+    assert_raises(Bowling::TooManyPins, "Knocking down 10 pins requires a spare") do
       Bowling.new("55" + "-" * 18)
     end
   end
 
   def test_strikes_must_be_thrown_at_the_start_of_a_frame
-    assert_raise(Bowling::StrikeTooLate, "Spares must occur at the end of a frame") do
+    assert_raises(Bowling::StrikeTooLate, "Spares must occur at the end of a frame") do
       Bowling.new("-X" + "-" * 18)
     end
   end
@@ -90,7 +90,7 @@ class BowlingTest < Minitest::Test
 
   def test_odd_tenth_frame_issues
     BAD_TENTH_FRAMES.each do |frame, error|
-      assert_raise(error) { Bowling.new('-' * 18 + frame) }
+      assert_raises(error) { Bowling.new('-' * 18 + frame) }
     end
   end
 

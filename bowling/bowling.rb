@@ -178,10 +178,6 @@ class Ball
     @score = nil
   end
 
-  def frame_number
-    frame.number
-  end
-
   def normal?
     false
   end
@@ -258,6 +254,7 @@ class Frame
 
   def add_throw(ball)
     @balls << ball
+    validate_throw!
   end
 
   def finished?
@@ -287,11 +284,20 @@ class Frame
   def second_ball
     @balls[1]
   end
+
+  private
+
+  def validate_throw!
+    raise Bowling::StrikeTooLate if second_ball && second_ball.strike?
+  end
 end
 
 class TenthFrame < Frame
   def initialize
     super 10
+  end
+
+  def validate_throw!
   end
 
   def finished?
