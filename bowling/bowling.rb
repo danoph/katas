@@ -74,15 +74,27 @@ class Game
   def score
     @score = @frame_scorer.score
 
-    puts "End Score:"
-    puts "\t#{@score}"
+    output_game
 
     @score
+  end
+
+  def output_game
+    @frame_scorer.frames.each do |frame|
+      puts "frame: #{frame.number}"
+
+      frame.balls.each_with_index do |ball, index|
+        puts "\tball #{index + 1}: #{ball.ball_str} - score: #{ball.score}"
+      end
+    end
+
+    puts "End Score:"
+    puts "\t#{@score}"
   end
 end
 
 class FrameScorer
-  attr_reader :score
+  attr_reader :score, :frames
 
   def initialize(ball_scorer = BallScorer.new)
     @frames = []
@@ -99,12 +111,6 @@ class FrameScorer
     @score = 0
 
     @frames.each do |frame|
-      puts "frame: #{frame.number}"
-
-      frame.balls.each_with_index do |ball, index|
-        puts "\tball #{index + 1}: #{ball.ball_str} - score: #{ball.score}"
-      end
-
       @score += score_frame frame
     end
   end
@@ -113,14 +119,13 @@ class FrameScorer
     frame.score = 0
 
     frame.balls.each do |ball|
-      if ball.is_a? Strike
+      if ball.strike?
         puts "scoring strike"
-      elsif ball.is_a? Spare
+      elsif ball.spare?
         puts "scoring spare"
       else
         puts "scoring ball: #{ball.ball_str}"
         frame.score += ball.score
-        #frame.score += @ball_scorer.ball_score(ball)
       end
     end
 
@@ -256,7 +261,7 @@ class Frame
   end
 
   def finished?
-    @balls.detect{|t| t.is_a?(Strike) || t.is_a?(Spare) } || two_balls?
+    @balls.detect{|ball| ball.strike? || ball.spare? } || two_balls?
   end
 
   def open?
