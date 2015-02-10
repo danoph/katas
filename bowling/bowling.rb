@@ -311,6 +311,11 @@ class TenthFrame < Frame
     super 10
   end
 
+  def validate_throw!
+    super
+    raise Bowling::GameTooLong if three_balls? && !three_ball_combos?
+  end
+
   def strike_too_late?
     false
   end
