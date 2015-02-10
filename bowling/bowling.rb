@@ -288,7 +288,16 @@ class Frame
   private
 
   def validate_throw!
-    raise Bowling::StrikeTooLate if second_ball && second_ball.strike?
+    raise Bowling::StrikeTooLate if strike_too_late?
+    raise Bowling::SpareTooEarly if spare_too_early?
+  end
+
+  def strike_too_late?
+    second_ball && second_ball.strike?
+  end
+
+  def spare_too_early?
+    first_ball && first_ball.spare?
   end
 end
 
@@ -297,7 +306,8 @@ class TenthFrame < Frame
     super 10
   end
 
-  def validate_throw!
+  def strike_too_late?
+    false
   end
 
   def finished?
