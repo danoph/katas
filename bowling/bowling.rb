@@ -39,9 +39,9 @@ class Bowling
 end
 
 class Game
-  def initialize(balls, frame_scorer = FrameScorer.new)
+  def initialize(balls)
     @balls = balls
-    @frame_scorer = frame_scorer
+    @frame_scorer = FrameScorer.new(BallScorer.new(balls))
     @frame_number = 0
     @score = 0
   end
@@ -96,7 +96,7 @@ end
 class FrameScorer
   attr_reader :score, :frames
 
-  def initialize(ball_scorer = BallScorer.new)
+  def initialize(ball_scorer)
     @frames = []
     @score = 0
     @ball_scorer = ball_scorer
@@ -119,14 +119,7 @@ class FrameScorer
     frame.score = 0
 
     frame.balls.each do |ball|
-      if ball.strike?
-        puts "scoring strike"
-      elsif ball.spare?
-        puts "scoring spare"
-      else
-        puts "scoring ball: #{ball.ball_str}"
-        frame.score += ball.score
-      end
+      frame.score += @ball_scorer.score_ball(ball)
     end
 
     frame.score
@@ -134,39 +127,41 @@ class FrameScorer
 end
 
 class BallScorer
-  #def initialize(balls)
-    #@balls = balls
-    #@scores = []
-  #end
+  def initialize(balls)
+    @balls = balls
+  end
 
-  #def score_balls
-    #@balls.each_with_index do |ball, throw_number|
-      #if ball.is_a?(Strike) && ball.frame_number < 10
-        #if @balls[throw_number + 1] && @balls[throw_number + 1].closed_frame?
-          #ball2 = @balls[throw_number + 1]
-          #ball.score += ball2.score
-        #end
+  def score_ball(ball)
+    score = ball.score
 
-        #if @balls[throw_number + 2] && @balls[throw_number + 2].closed_frame?
-          #ball3 = @balls[throw_number + 2]
-          #ball.score += ball3.score
-        #end
-      #elsif ball.is_a?(Spare)
-        #ball.score = 10 - @balls[throw_number - 1].score
+    if ball.strike? && ball.frame_number != 10
+      ball_one = next_ball(ball)
+      ball_two = next_ball(ball_one) if ball_one
 
-        #if @balls[throw_number + 1] && ball.frame_number < 10
-          #ball2 = @balls[throw_number + 1]
-          #ball.score += ball2.score
-        #end
-      #end
+      score += ball_one.score if ball_one
+      score += ball_two.score if ball_two
+    elsif ball.spare?
+      prev_ball = previous_ball(ball)
+      score = ball.score - prev_ball.score
 
-      #@scores << ball.score
+      if ball.frame_number != 10
+        ball_one = next_ball(ball)
+        score += ball_one.score if ball_one
+      end
+    else
+      score = ball.score
+    end
 
-      #puts "ball #{throw_number} - score: #{ball.score}"
-    #end
+    score
+  end
 
-    #@scores.inject(0, &:+)
-  #end
+  def previous_ball(ball)
+    @balls[@balls.find_index(ball) - 1]
+  end
+
+  def next_ball(ball)
+    @balls[@balls.find_index(ball) + 1]
+  end
 end
 
 class Ball
@@ -188,6 +183,10 @@ class Ball
 
   def strike?
     false
+  end
+
+  def frame_number
+    frame.number
   end
 end
 
@@ -220,6 +219,7 @@ class Spare < Ball
 
   def initialize
     super '/'
+    @score = 10
   end
 
   def spare?
@@ -230,10 +230,7 @@ end
 class GutterBall < Ball
   def initialize
     super '-'
-  end
-
-  def score
-    0
+    @score = 0
   end
 
   def normal?
