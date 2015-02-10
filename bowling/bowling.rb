@@ -290,6 +290,7 @@ class Frame
   def validate_throw!
     raise Bowling::StrikeTooLate if strike_too_late?
     raise Bowling::SpareTooEarly if spare_too_early?
+    raise Bowling::TooManyPins if too_many_pins?
   end
 
   def strike_too_late?
@@ -298,6 +299,10 @@ class Frame
 
   def spare_too_early?
     first_ball && first_ball.spare?
+  end
+
+  def too_many_pins?
+    two_balls? && first_ball.normal? && second_ball.normal? && first_ball.score + second_ball.score == 10
   end
 end
 
