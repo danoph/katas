@@ -132,37 +132,54 @@ class BallScorer
   end
 
   def score_ball(ball)
+    if ball.strike?
+      score_strike ball
+    elsif ball.spare?
+      score_spare ball
+    else
+      score_normal ball
+    end
+  end
+
+  def score_strike(ball)
     score = ball.score
 
-    if ball.strike?
-      unless ball.frame_number == 10
-        ball_one = next_ball(ball)
+    unless ball.frame_number == 10
+      ball_one = next_ball(ball)
 
-        if ball_one && ball_one.scored?
-          score += ball_one.score
+      if ball_one && ball_one.scored?
+        score += ball_one.score
 
-          ball_two = next_ball(ball_one)
+        ball_two = next_ball(ball_one)
 
-          if ball_two && ball_two.scored?
-            score += ball_two.score
-          end
-        end
-      end
-    elsif ball.spare?
-      prev_ball = previous_ball(ball)
-      ball.score = 10 - prev_ball.score
-      score = ball.score
-
-      unless ball.frame_number == 10
-        ball_one = next_ball(ball)
-
-        if ball_one && ball_one.scored?
-          score += ball_one.score
+        if ball_two && ball_two.scored?
+          score += ball_two.score
         end
       end
     end
 
     score
+  end
+
+  def score_spare(ball)
+    prev_ball = previous_ball(ball)
+    ball.score = 10 - prev_ball.score
+
+    score = ball.score
+
+    unless ball.frame_number == 10
+      ball_one = next_ball(ball)
+
+      if ball_one && ball_one.scored?
+        score += ball_one.score
+      end
+    end
+
+    score
+  end
+
+  def score_normal(ball)
+    ball.score
   end
 
   def previous_ball(ball)
