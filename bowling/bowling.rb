@@ -34,6 +34,7 @@ class Bowling
   end
 
   def score
+    @game.output_game
     @game.score
   end
 end
@@ -72,11 +73,7 @@ class Game
   end
 
   def score
-    @score = @frame_scorer.score
-
-    output_game
-
-    @score
+    @frame_scorer.score
   end
 
   def output_game
@@ -92,7 +89,7 @@ class Game
     end
 
     puts "End Score:"
-    puts "\t#{@score}"
+    puts "\t#{score}"
   end
 end
 
@@ -115,7 +112,6 @@ class FrameScorer
 
     @frames.each do |frame|
       @score += score_frame frame
-      puts "total score: #{@score}"
     end
   end
 
@@ -136,51 +132,37 @@ class BallScorer
   end
 
   def score_ball(ball)
-    return ball.score if ball.scored?
+    score = ball.score
 
     if ball.strike?
-      ball.score = 10
-
-      if ball.frame_number == 10
-        #puts "marking 10th frame strike scored"
-        ball.scored = true
-      else
+      unless ball.frame_number == 10
         ball_one = next_ball(ball)
 
         if ball_one && ball_one.scored?
-          #puts "adding score of next ball #{ball_one.score} to ball's score: #{ball.score}"
-          ball.score += ball_one.score
+          score += ball_one.score
 
           ball_two = next_ball(ball_one)
 
           if ball_two && ball_two.scored?
-            #puts "adding score of second ball #{ball_two.score} to ball's score: #{ball.score}"
-            ball.score += ball_two.score
-            ball.scored = true
+            score += ball_two.score
           end
         end
       end
     elsif ball.spare?
       prev_ball = previous_ball(ball)
       ball.score = 10 - prev_ball.score
-      puts "frame: #{ball.frame_number} - ball score: #{ball.score} - prev ball score: #{prev_ball.score}"
+      score = ball.score
 
-      if ball.frame_number == 10
-        ball.scored = true
-      else
+      unless ball.frame_number == 10
         ball_one = next_ball(ball)
 
         if ball_one && ball_one.scored?
-          puts "frame: #{ball.frame_number} - ball score: #{ball.score} - next ball score: #{ball_one.score}"
-          ball.score += ball_one.score
-          ball.scored = true
+          score += ball_one.score
         end
       end
-    else
-      ball.scored = true
     end
 
-    ball.score
+    score
   end
 
   def previous_ball(ball)
@@ -193,13 +175,12 @@ class BallScorer
 end
 
 class Ball
-  attr_accessor :frame, :scored
+  attr_accessor :frame
   attr_reader :ball_str, :score
 
   def initialize(ball_str)
     @ball_str = ball_str
     @score = nil
-    @scored = true
   end
 
   def normal?
@@ -219,7 +200,7 @@ class Ball
   end
 
   def scored?
-    !!@scored
+    !!@score
   end
 end
 
@@ -240,7 +221,6 @@ class Strike < Ball
   def initialize
     super 'X'
     @score = 10
-    @scored = false
   end
 
   def strike?
@@ -253,7 +233,6 @@ class Spare < Ball
 
   def initialize
     super '/'
-    @scored = false
   end
 
   def spare?
