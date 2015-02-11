@@ -31,6 +31,16 @@ class BowlingTest < Minitest::Test
 
   def test_sample_game_is_worth_168
     b = Bowling.new("X7/729/XXX236/7/3")
+    puts "X" # 20
+    puts "7/" # 37
+    puts "72" # 46
+    puts "9/" # 66
+    puts "X" # 96
+    puts "X" # 118
+    puts "X" # 133
+    puts "23" # 138
+    puts "6/" # 155
+    puts "7/3" # 168
     assert_equal 168, b.score, "X7/729/XXX236/7/3"
   end
 
