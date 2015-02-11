@@ -31,10 +31,10 @@ class Bowling
 
     @game = Game.new(balls)
     @game.play
+    @game.output_game
   end
 
   def score
-    @game.output_game
     @game.score
   end
 end
@@ -57,13 +57,15 @@ class Game
 
       if frame.finished?
         @frame_scorer.add_frame(frame)
-        frame = new_frame
+        frame = new_frame unless game_finished?
       end
     end
   end
 
   def new_frame
     @frame_number += 1
+
+    raise Bowling::GameTooLong if too_many_frames?
 
     if @frame_number == 10
       TenthFrame.new
@@ -90,6 +92,16 @@ class Game
 
     puts "End Score:"
     puts "\t#{score}"
+  end
+
+  private
+
+  def too_many_frames?
+    @frame_number > 10
+  end
+
+  def game_finished?
+    @frame_number == 10
   end
 end
 
