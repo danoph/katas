@@ -60,6 +60,10 @@ class Game
         frame = new_frame unless game_finished?
       end
     end
+
+    unless game_finished? && frame.finished?
+      raise Bowling::GameTooShort
+    end
   end
 
   def new_frame
@@ -355,8 +359,12 @@ class TenthFrame < Frame
     raise Bowling::GameTooLong if three_balls? && !three_ball_combos?
   end
 
+  def spare_too_early?
+    super || (first_ball.strike? && second_ball && second_ball.spare?) || (second_ball && second_ball.spare? && third_ball && third_ball.spare?)
+  end
+
   def strike_too_late?
-    false
+    (first_ball.strike? && second_ball && second_ball.normal? && third_ball && third_ball.strike?) || (first_ball.normal? && second_ball && second_ball.strike? && third_ball && third_ball.normal?)
   end
 
   def finished?
