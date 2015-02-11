@@ -345,7 +345,7 @@ class Frame
   end
 
   def too_many_pins?
-    two_balls? && first_ball.normal? && second_ball.normal? && first_ball.score + second_ball.score == 10
+    two_balls? && first_ball.normal? && second_ball.normal? && first_ball.score + second_ball.score >= 10
   end
 end
 
@@ -365,6 +365,10 @@ class TenthFrame < Frame
 
   def strike_too_late?
     (first_ball.strike? && second_ball && second_ball.normal? && third_ball && third_ball.strike?) || (first_ball.normal? && second_ball && second_ball.strike? && third_ball && third_ball.normal?)
+  end
+
+  def too_many_pins?
+    super || (three_balls? && third_ball.normal? && second_ball.normal? && second_ball.score + third_ball.score >= 10)
   end
 
   def finished?

@@ -100,6 +100,7 @@ class BowlingTest < Minitest::Test
 
   def test_odd_tenth_frame_issues
     BAD_TENTH_FRAMES.each do |frame, error|
+      puts "test: #{frame}"
       assert_raises(error) { Bowling.new('-' * 18 + frame) }
     end
   end
@@ -112,4 +113,14 @@ class BowlingTest < Minitest::Test
     end
   end
 
+end
+
+def assert_nothing_raised
+  exception = nil
+  begin
+    yield
+  rescue => e
+    exception = e
+  end
+  assert_nil(exception, "An exception was not expected but was raised: #{exception}")
 end
