@@ -1,249 +1,163 @@
-class CardsBuilder
-  def initialize(cards_string)
-    @cards_string = cards_string
+class TexasHoldEm
+  def initialize(cards)
+    @cards = cards.split ' '
+
+    raise ArgumentError if @cards.length != 7
+    raise ArgumentError if @cards != @cards.uniq
+
+    @cards = @cards.map{|c| Card.new(c) }
+
+    @hands = Hands.new(@cards)
   end
 
-  def cards
-    @cards = @cards_string.split(' ').map do |card_string|
-      CardBuilder.new(card_string).card
-    end
-
-    card_names = @cards.map(&:to_s_with_suit)
-    raise ArgumentError if card_names.uniq != card_names
-
-    puts "cards: #{@cards.map(&:to_s)}"
-
-    @cards
+  def best_hand
+    @hands.best_hand.to_s
   end
 end
 
-class CardBuilder
-  def initialize(card_string)
-    @suit_string = card_string.slice! -1
-    @card_string = card_string
-  end
-
-  def card
-    suit = Suit.new(@suit_string).suit
-    Card.new @card_string, suit
-  end
-end
-
-class Card
-  VALID_RANKS = [ "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" ]
-
-  attr_reader :card_string, :suit
-
-  def initialize(card_string, suit)
-    raise ArgumentError unless VALID_RANKS.include? card_string
-
-    @card_string = card_string
-    @suit = suit
-  end
-
-  def to_s
-    card_string
-  end
-
-  def to_s_with_suit
-    "#{card_string} (#{suit})"
-  end
-
-  def <=>(other_card)
-    VALID_RANKS.index(card_string) <=> VALID_RANKS.index(other_card.card_string)
-  end
-
-  def ==(other_card)
-    card_string == other_card.card_string if other_card
-  end
-end
-
-class Suit
-  VALID_SUITS = [ "H", "D", "C", "S" ]
-
-  attr_reader :suit
-
-  def initialize(suit)
-    raise ArgumentError unless VALID_SUITS.include? suit
-    @suit = suit
-  end
-
-  def to_s
-    self.class.name
-  end
-end
+#1. **Royal Flush** *... this consists of the cards Ace, King, Queen, Jack, and 10 of the same suit.*
+#2. **Straight Flush** *... this consists of five cards from the same suit in sequential order.*
+#3. **Four of a Kind** *... this consists of the same card in all four suits.*
+#4. **Full House** *... this consists of a set of one card in three suits, and a second card in two suits.*
+#5. **Flush** *... this consists of five cards of the same suit.*
+#6. **Straight** *... this consists of five cards in sequential order.*
+#7. **Three of a Kind** *... this consists of the same card in three suits.*
+#8. **Two Pair** *... this consists of two distinct pairs of cards.*
+#9. **One Pair** *... this consists of the same card in two suits.*
+#10. **High Card** *... this is just any single card.*
 
 class Hand
   def initialize(cards)
     @cards = cards
   end
 
-  def best_hand
-    if kind = royal_flush?
-      "Royal Flush (#{kind} high)"
-    elsif kind = straight_flush?
-      "Straight Flush (#{kind} high)"
-    elsif kind = four_of_a_kind?
-      "Four of a Kind (#{kind} high)"
-    elsif kind = full_house?
-      "Full House (#{kind} high)"
-    elsif kind = flush?
-      "Flush (#{kind} high)"
-    elsif kind = straight?
-      "Straight (#{kind} high)"
-    elsif kind = three_of_a_kind?
-      "Three of a Kind (#{kind} high)"
-    elsif pair = two_pair?
-      "Two Pair (#{pair.first.first.card_string} high)"
-    elsif kind = two_of_a_kind?
-      "Two of a Kind (#{kind} high)"
-    else
-      "High Card (#{high_card} high)"
-    end
+  def <=>(other_hand)
+    rank > other_hand.rank ? 1 : -1
   end
 
-  def high_card
-    @cards.sort.last
-  end
-
-  def full_house?
-    two_of_a_kind? && three_of_a_kind?
-  end
-
-  def two_pair?
-    pairs if pairs.count >= 2
-  end
-
-  def straight_flush?
-    if straight? && flush? && straight.map { |x| x.suit}.uniq.length == 1
-      flush?
-    end
-  end
-
-  def royal_flush?
-    if straight? && flush? && straight? == flush? && straight?.card_string == 'A'
-      straight?
-    end
-  end
-
-  def straight
-    @straight ||= begin
-      sorted = @cards.sort
-
-      if check_straight(sorted[2..6])
-        sorted[2..6]
-      elsif check_straight(sorted[1..5])
-        sorted[1..5]
-      elsif check_straight(sorted[0..4])
-        sorted[0..4]
-      end
-    end
-  end
-
-  def straight?
-    straight.last if straight
-  end
-
-  def flush?
-    cards_by_suit.keys.each do |suit|
-      if cards_by_suit[suit].count >= 5
-        return cards_by_suit[suit].sort.reverse.first
-      end
-    end
-
+  def valid?
     false
   end
 
-  def check_straight(five_cards)
-    index = Card::VALID_RANKS.index(five_cards.first.to_s)
-
-    if index + 4 > Card::VALID_RANKS.length
-      return false
-    end
-
-    things = Card::VALID_RANKS[index..(index+4)]
-
-    five_cards = five_cards.map(&:to_s)
-    five_cards == things
+  def name
+    ""
   end
 
-  def pairs
-    return @pairs if @pairs
-
-    @pairs = []
-
-    kinds.keys.each do |kind|
-      @pairs << kinds[kind] if kinds[kind].count >= 2
-    end
-
-    @pairs
-  end
-
-  def two_of_a_kind?
-    kinds.keys.each do |kind|
-      if kinds[kind].count == 2
-        return kind
-      end
-    end
-
-    false
-  end
-
-  def three_of_a_kind?
-    kinds.keys.each do |kind|
-      if kinds[kind].count == 3
-        return kind
-      end
-    end
-
-    false
-  end
-
-  def four_of_a_kind?
-    kinds.keys.each do |kind|
-      if kinds[kind].count == 4
-        return kind
-      end
-    end
-
-    false
-  end
-
-  def kinds
-    return @kinds if @kinds
-
-    @kinds = {}
-
-    @cards.sort.reverse.each do |card|
-      @kinds[card.card_string] ||= []
-      @kinds[card.card_string] << card
-    end
-
-    @kinds
-  end
-
-  def cards_by_suit
-    return @cards_by_suit if @cards_by_suit
-
-    @cards_by_suit = {}
-
-    @cards.sort.reverse.each do |card|
-      @cards_by_suit[card.suit] ||= []
-      @cards_by_suit[card.suit] << card
-    end
-
-    @cards_by_suit
+  def to_s
+    "#{name} (#{high_card} high)"
   end
 end
 
-class TexasHoldEm
+class RoyalFlush < Hand
+  def rank; 1; end
+end
+
+class StraightFlush < Hand
+  def rank; 2; end
+end
+
+class FourOfAKind < Hand
+  def rank; 3; end
+end
+
+class FullHouse < Hand
+  def rank; 4; end
+end
+
+class Flush < Hand
+  def rank; 5; end
+end
+
+class Straight < Hand
+  def rank; 6; end
+end
+
+class ThreeOfAKind < Hand
+  def rank; 7; end
+end
+
+class TwoPair < Hand
+  def rank; 8; end
+end
+
+class OnePair < Hand
+  def rank; 9; end
+
+  def name
+    "Two of a Kind"
+  end
+
+  def high_card
+
+  end
+
+  def valid?
+    true if @cards.map(&:card_string).uniq != @cards.map(&:card_string)
+  end
+end
+
+class HighCard < Hand
+  def rank; 10; end
+
+  def name
+    "High Card"
+  end
+
+  def high_card
+    @cards.sort.reverse.pop
+  end
+
+  def valid?
+    true
+  end
+end
+
+POSSIBLE_HANDS = [ RoyalFlush, StraightFlush, FourOfAKind, FullHouse, Flush, Straight, ThreeOfAKind, TwoPair, OnePair, HighCard ]
+
+class Hands
   def initialize(cards)
-    @cards = CardsBuilder.new(cards).cards
-    raise ArgumentError.new unless @cards.count == 7
-    @hand = Hand.new(@cards)
+    @cards = cards
+    @hands = POSSIBLE_HANDS.map{|hand| build_hand(hand) }.compact
+  end
+
+  def build_hand(possible_hand)
+    hand = possible_hand.new(@cards)
+    hand if hand.valid?
   end
 
   def best_hand
-    @hand.best_hand
+    @hands.sort.reverse.pop
+  end
+end
+
+class Card
+  VALID_RANKS = [ "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" ]
+  VALID_SUITS = [ "H", "D", "C", "S" ]
+
+  attr_reader :card_string
+
+  def initialize(card_string)
+    @suit = card_string.slice! -1
+    @card_string = card_string
+
+    raise ArgumentError unless valid?
+  end
+
+  private
+
+  def valid?
+    VALID_RANKS.include?(@card_string) && VALID_SUITS.include?(@suit)
+  end
+
+  def <=>(other_card)
+    if VALID_RANKS.find_index(@card_string) > VALID_RANKS.find_index(other_card.card_string)
+      -1
+    else
+      1
+    end
+  end
+
+  def to_s
+    "#{@card_string}"
   end
 end
