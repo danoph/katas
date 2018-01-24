@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'texas_hold_em'
+require './texas_hold_em'
 
 class TexasHoldEmTest < Test::Unit::TestCase
 
