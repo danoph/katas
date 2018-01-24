@@ -7,22 +7,18 @@ class TexasHoldEm
     valid_suits = ['H','C','S','D']
 
     valid_cards = valid_suits.map do |suit|
-      valid_values.map  do |value|
-        "#{ value }#{ suit }"
-      end
+      valid_values.map{|value| "#{ value }#{ suit }" }
     end.flatten
 
     cards.each do |card|
-      card_found = valid_cards.find{|valid_card| card == valid_card }
-      if !card_found
-        raise(ArgumentError, "Should not accept #{ card }")
+      unless valid_cards.find{|valid_card| card == valid_card }
+        raise ArgumentError, "Should not accept #{ card }"
       end
     end
 
   end
 
   def initialize(cards)
-    # Implement me!
     cards = cards.split(' ')
 
     if cards.length > 7
@@ -36,7 +32,6 @@ class TexasHoldEm
     end
 
     validate_cards(cards)
-
   end
 
   def best_hand
