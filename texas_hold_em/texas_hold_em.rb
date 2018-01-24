@@ -1,6 +1,8 @@
 class TexasHoldEm
   def initialize(cards)
     @cards = cards.split(' ')
+    @ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
+    @suits = ['H','C','S','D']
 
     if @cards.length > 7
       raise(ArgumentError, 'Should not accept more than 7 cards')
@@ -16,22 +18,24 @@ class TexasHoldEm
   end
 
   def best_hand
-    # @cards.each do |card|
-    #
-    # end
+    ranks = []
+    @cards.each do |card|
+      ranks << card[0...-1]
+    end
 
-    "High Card (K high)"
+    if ranks.uniq.length == 6
+      "Two of a Kind (7 high)"
+    else
+      "High Card (K high)"
+    end
   end
 
   private
 
   def validate_cards
-    ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
 
-    suits = ['H','C','S','D']
-
-    valid_cards = suits.map do |suit|
-      ranks.map{|rank| "#{ rank }#{ suit }" }
+    valid_cards = @suits.map do |suit|
+      @ranks.map{|rank| "#{ rank }#{ suit }" }
     end.flatten
 
     @cards.each do |card|
