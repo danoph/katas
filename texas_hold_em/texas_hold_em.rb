@@ -23,9 +23,9 @@ class TexasHoldEm
       ranks << card[0...-1]
     end
 
-    pairs = ranks.select{|rank| ranks.count(rank) == 2 } # => [ "7", "7" ]
+    pairs = find_pairs(ranks)
 
-    if pairs.length > 0
+    if pairs.length == 1
       "Two of a Kind (#{ pairs[0] } high)"
     else
       "High Card (K high)"
@@ -35,7 +35,6 @@ class TexasHoldEm
   private
 
   def validate_cards
-
     valid_cards = @suits.map do |suit|
       @ranks.map{|rank| "#{ rank }#{ suit }" }
     end.flatten
@@ -45,6 +44,11 @@ class TexasHoldEm
         raise ArgumentError, "Should not accept #{ card }"
       end
     end
+  end
+
+  
+  def find_pairs(ranks)
+    ranks.select{|rank| ranks.count(rank) == 2 }.uniq
   end
 
 end
