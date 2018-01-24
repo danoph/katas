@@ -23,8 +23,10 @@ class TexasHoldEm
       ranks << card[0...-1]
     end
 
-    if ranks.uniq.length == 6
-      "Two of a Kind (7 high)"
+    pairs = ranks.select{|rank| ranks.count(rank) == 2 } # => [ "7", "7" ]
+
+    if pairs.length > 0
+      "Two of a Kind (#{ pairs[0] } high)"
     else
       "High Card (K high)"
     end
