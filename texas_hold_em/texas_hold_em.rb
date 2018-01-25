@@ -28,7 +28,7 @@ class TexasHoldEm
     if pairs.length == 1
       "Two of a Kind (#{ pairs[0] } high)"
     else
-      "High Card (K high)"
+      "High Card (#{ high_value(ranks) } high)"
     end
   end
 
@@ -46,7 +46,15 @@ class TexasHoldEm
     end
   end
 
-  
+  def high_value(ranks)
+    puts "Cards: #{@cards}"
+
+    rank1 = ranks.map{|e| @ranks.find_index(e) }
+    puts "ranks 1: #{ rank1 }"
+    puts "Max: #{ rank1.max }-#{ @ranks[rank1.max] }"
+    @ranks[rank1.max]
+  end
+
   def find_pairs(ranks)
     ranks.select{|rank| ranks.count(rank) == 2 }.uniq
   end
