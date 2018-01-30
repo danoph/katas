@@ -19,31 +19,37 @@ class TexasHoldEm
 
   def best_hand
     ranks = []
+    suits = []
     @cards.each do |card|
       ranks << card[0...-1]
+      suits << card[-1]
     end
 
     pairs = find_pairs(ranks)
     triplets = find_triplets(ranks)
     quads = find_quads(ranks)
+    flush = find_flush(suits)
 
-    if quads.length == 1
-      "Four of a Kind (#{ quads.max } high)"
-    elsif triplets.length == 1
-      full_house_pairs = find_pairs(ranks-triplets)
-      if full_house_pairs.length >= 1
-        "Full House (#{ triplets.max } high)"
-      else
-          "Three of a Kind (#{ triplets.max } high)"
-      end
+    if flush.length == 1
+      "Flush (#{ high_value(ranks) } high)"
     else
-
-      if pairs.length == 1
-        "Two of a Kind (#{ pairs[0] } high)"
-      elsif pairs.length == 2
-        "Two Pair (#{ pairs.max } high)"
+      if quads.length == 1
+        "Four of a Kind (#{ quads.max } high)"
+      elsif triplets.length == 1
+        full_house_pairs = find_pairs(ranks-triplets)
+        if full_house_pairs.length >= 1
+          "Full House (#{ triplets.max } high)"
+        else
+          "Three of a Kind (#{ triplets.max } high)"
+        end
       else
-        "High Card (#{ high_value(ranks) } high)"
+        if pairs.length == 1
+          "Two of a Kind (#{ pairs[0] } high)"
+        elsif pairs.length == 2
+          "Two Pair (#{ pairs.max } high)"
+        else
+          "High Card (#{ high_value(ranks) } high)"
+        end
       end
     end
   end
@@ -80,5 +86,9 @@ class TexasHoldEm
 
   def find_quads(ranks)
     ranks.select{|rank| ranks.count(rank) == 4 }.uniq
+  end
+
+  def find_flush(suits)
+    suits.select{|suit| suits.count(suit) >= 5 }.uniq
   end
 end
