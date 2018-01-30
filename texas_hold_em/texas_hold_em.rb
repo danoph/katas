@@ -29,21 +29,24 @@ class TexasHoldEm
     triplets = find_triplets(ranks)
     quads = find_quads(ranks)
     flush = find_flush(suits)
+    straight = find_straight(ranks)
 
     if flush.length == 1
       flush_ranks = find_flush_ranks(flush[0])
-      straight = find_straight(flush_ranks)
-      if straight
-        if straight == 'A'
-          "Royal Flush (#{ straight } high)"
+      puts('Flush_Ranks= ', flush_ranks)
+
+      puts('Flush_High_Card= ', high_value(flush_ranks))
+      straight_flush = find_straight(flush_ranks)
+      if straight_flush
+        if straight_flush == 'A'
+          "Royal Flush (#{ straight_flush } high)"
         else
-          "Straight Flush (#{ straight } high)"
+          "Straight Flush (#{ straight_flush } high)"
         end
       else
-        "Flush (#{ high_value(ranks) } high)"
+        "Flush (#{ high_value(flush_ranks) } high)"
       end
     else
-      straight = find_straight(ranks)
       if straight
         "Straight (#{ straight } high)"
       elsif quads.length == 1
