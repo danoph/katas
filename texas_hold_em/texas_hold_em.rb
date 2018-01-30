@@ -34,7 +34,11 @@ class TexasHoldEm
       flush_ranks = find_flush_ranks(flush[0])
       straight = find_straight(flush_ranks)
       if straight
-        "Straight Flush (#{ straight } high)"
+        if straight == 'A'
+          "Royal Flush (#{ straight } high)"
+        else
+          "Straight Flush (#{ straight } high)"
+        end
       else
         "Flush (#{ high_value(ranks) } high)"
       end
