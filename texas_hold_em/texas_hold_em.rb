@@ -33,7 +33,10 @@ class TexasHoldEm
     if flush.length == 1
       "Flush (#{ high_value(ranks) } high)"
     else
-      if quads.length == 1
+      straight = find_straight(ranks)
+      if straight
+        "Straight (#{ straight } high)"
+      elsif quads.length == 1
         "Four of a Kind (#{ quads.max } high)"
       elsif triplets.length == 1
         full_house_pairs = find_pairs(ranks-triplets)
@@ -90,5 +93,32 @@ class TexasHoldEm
 
   def find_flush(suits)
     suits.select{|suit| suits.count(suit) >= 5 }.uniq
+  end
+
+  def find_straight(ranks)
+    previous_rank = nil
+    straight_rank = []
+    ordered_ranks = ranks.map{|e| @ranks.find_index(e) }.sort
+    ordered_ranks.each do |rank|
+      if !previous_rank
+        straight_rank << rank
+      else
+        if previous_rank + 1 == rank
+          straight_rank << rank
+        else
+          if straight_rank.length < 5
+            straight_rank = []
+          end
+        end
+      end
+      previous_rank = rank
+    end
+
+    if straight_rank.length >= 5
+      straight_rank[-5]
+      @ranks[straight_rank.max]
+    else
+      nil
+    end
   end
 end
