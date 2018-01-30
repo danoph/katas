@@ -31,7 +31,13 @@ class TexasHoldEm
     flush = find_flush(suits)
 
     if flush.length == 1
-      "Flush (#{ high_value(ranks) } high)"
+      flush_ranks = find_flush_ranks(flush[0])
+      straight = find_straight(flush_ranks)
+      if straight
+        "Straight Flush (#{ straight } high)"
+      else
+        "Flush (#{ high_value(ranks) } high)"
+      end
     else
       straight = find_straight(ranks)
       if straight
@@ -93,6 +99,15 @@ class TexasHoldEm
 
   def find_flush(suits)
     suits.select{|suit| suits.count(suit) >= 5 }.uniq
+  end
+
+  def find_flush_ranks(suit)
+    ranks = []
+    filtered_cards = @cards.select{|card| card[-1] == suit}
+    filtered_cards.each do |card|
+      ranks << card[0...-1]
+    end
+    ranks
   end
 
   def find_straight(ranks)
