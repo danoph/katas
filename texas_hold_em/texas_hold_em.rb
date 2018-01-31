@@ -1,9 +1,12 @@
-class TexasHoldEm
-  def initialize(cards)
-    @cards = cards.split(' ')
-    @ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
-    @suits = ['H','C','S','D']
+VALID_RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
+VALID_SUITS = ['H','C','S','D']
 
+class CardsValidator
+  def initialize(cards)
+    @cards = cards
+  end
+
+  def validate
     if @cards.length > 7
       raise(ArgumentError, 'Should not accept more than 7 cards')
     elsif @cards.length < 7
@@ -14,7 +17,25 @@ class TexasHoldEm
       raise(ArgumentError, 'Should not accept duplicated cards')
     end
 
-    validate_cards
+    valid_cards = VALID_SUITS.map do |suit|
+      VALID_RANKS.map{|rank| "#{ rank }#{ suit }" }
+    end.flatten
+
+    @cards.each do |card|
+      unless valid_cards.find{|valid_card| card == valid_card }
+        raise ArgumentError, "Should not accept #{ card }"
+      end
+    end
+  end
+end
+
+class TexasHoldEm
+  def initialize(cards)
+    @cards = cards.split(' ')
+
+    cards_validator = CardsValidator.new(@cards)
+
+    cards_validator.validate
   end
 
   def best_hand
@@ -70,22 +91,10 @@ class TexasHoldEm
 
   private
 
-  def validate_cards
-    valid_cards = @suits.map do |suit|
-      @ranks.map{|rank| "#{ rank }#{ suit }" }
-    end.flatten
-
-    @cards.each do |card|
-      unless valid_cards.find{|valid_card| card == valid_card }
-        raise ArgumentError, "Should not accept #{ card }"
-      end
-    end
-  end
-
   def high_value(ranks)
-    # create array of index locations of each ranks within the @ranks list
-    rank1 = ranks.map{|e| @ranks.find_index(e) }
-    @ranks[rank1.max]
+    # create array of index locations of each ranks within the VALID_RANKS list
+    rank1 = ranks.map{|e| VALID_RANKS.find_index(e) }
+    VALID_RANKS[rank1.max]
   end
 
   def find_pairs(ranks)
@@ -116,7 +125,7 @@ class TexasHoldEm
   def find_straight(ranks)
     previous_rank = nil
     straight_rank = []
-    ordered_ranks = ranks.map{|e| @ranks.find_index(e) }.sort
+    ordered_ranks = ranks.map{|e| VALID_RANKS.find_index(e) }.sort
     ordered_ranks.each do |rank|
       if !previous_rank
         straight_rank << rank
@@ -134,7 +143,7 @@ class TexasHoldEm
 
     if straight_rank.length >= 5
       straight_rank[-5]
-      @ranks[straight_rank.max]
+      VALID_RANKS[straight_rank.max]
     else
       nil
     end
