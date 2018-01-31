@@ -49,8 +49,8 @@ class TexasHoldEm
         "Straight (#{ straight } high)"
       elsif quads.length == 1
         "Four of a Kind (#{ quads.max } high)"
-      elsif triplets.length == 1
-        full_house_pairs = find_pairs(ranks-triplets)
+      elsif triplets.length >= 1
+        full_house_pairs = find_pairs(ranks - [triplets.max])
         if full_house_pairs.length >= 1
           "Full House (#{ triplets.max } high)"
         else
@@ -89,7 +89,7 @@ class TexasHoldEm
   end
 
   def find_pairs(ranks)
-    ranks.select{|rank| ranks.count(rank) == 2 }.uniq
+    ranks.select{|rank| ranks.count(rank) >= 2 }.uniq
   end
 
   def find_triplets(ranks)
