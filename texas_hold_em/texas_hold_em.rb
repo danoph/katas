@@ -33,10 +33,8 @@ class TexasHoldEm
 
     if flush.length == 1
       flush_ranks = find_flush_ranks(flush[0])
-      puts('Flush_Ranks= ', flush_ranks)
-
-      puts('Flush_High_Card= ', high_value(flush_ranks))
       straight_flush = find_straight(flush_ranks)
+
       if straight_flush
         if straight_flush == 'A'
           "Royal Flush (#{ straight_flush } high)"
@@ -87,8 +85,6 @@ class TexasHoldEm
   def high_value(ranks)
     # create array of index locations of each ranks within the @ranks list
     rank1 = ranks.map{|e| @ranks.find_index(e) }
-    puts "ranks 1: #{ rank1 }"
-    puts "Max: #{ rank1.max }-#{ @ranks[rank1.max] }"
     @ranks[rank1.max]
   end
 
