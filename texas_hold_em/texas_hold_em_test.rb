@@ -81,6 +81,16 @@ class TexasHoldEmTest < Test::Unit::TestCase
     assert_equal "Full House (2 high)", TexasHoldEm.new(cards).best_hand
   end
 
+  def test_pick_three_of_a_kind_and_not_full_house
+    cards = "AH KC 2D 2H 2C 5S 8S"
+    assert_equal "Three of a Kind (2 high)", TexasHoldEm.new(cards).best_hand
+  end
+
+  def test_pick_full_house_and_not_three_of_a_kind
+    cards = "KH KC 2D 2H 2C KS 8S"
+    assert_equal "Full House (K high)", TexasHoldEm.new(cards).best_hand
+  end
+
   #########
   #       #
   # Flush #
