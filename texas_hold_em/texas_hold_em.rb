@@ -2,8 +2,13 @@ class Card
   attr_reader :rank, :suit
 
   def initialize(card_string)
+    @card_string = card_string
     @rank = card_string[0...-1]
     @suit = card_string[-1]
+  end
+
+  def to_s
+    @card_string
   end
 end
 
@@ -13,14 +18,15 @@ class TexasHoldEm
 
   VALID_NUMBER_OF_CARDS = 7
 
-  def initialize(card_string)
-    cards = card_string.split ' '
+  def initialize(cards_string)
+    cards = cards_string.split ' '
 
-    cards.each do |card|
-      rank = card[0...-1]
-      suit = card[-1]
+    cards.each do |card_string|
+      card = Card.new(card_string)
 
-      raise ArgumentError, "Should not accept #{ card }" unless VALID_RANKS.include?(rank) && VALID_SUITS.include?(suit)
+      unless VALID_RANKS.include?(card.rank) && VALID_SUITS.include?(card.suit)
+        raise ArgumentError, "Should not accept #{ card }"
+      end
     end
 
     raise ArgumentError, "Should not accept more than 7 cards" if cards.length > VALID_NUMBER_OF_CARDS
