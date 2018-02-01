@@ -73,11 +73,33 @@ describe TexasHoldEmCardsValidator do
   end
 end
 
+describe TexasPlayerCardsFactory do
+  let(:cards_string) { [ card_string1, card_string2, card_string3 ].join(' ') }
+  let(:card_string1) { 'card-string-1' }
+  let(:card_string2) { 'card-string-2' }
+  let(:card_string3) { 'card-string-3' }
+
+  let(:cards) { [ card1, card2, card3 ] }
+
+  let(:card1) { double 'card1' }
+  let(:card2) { double 'card2' }
+  let(:card3) { double 'card3' }
+
+  before do
+    allow(Card).to receive(:new).with(card_string1) { card1 }
+    allow(Card).to receive(:new).with(card_string2) { card2 }
+    allow(Card).to receive(:new).with(card_string3) { card3 }
+  end
+
+  describe '#build' do
+    it 'returns cards from strings' do
+      expect(subject.build(cards_string)).to eq(cards)
+    end
+  end
+end
+
 describe TexasHoldEm do
   subject { described_class.new card_string }
 
   let(:card_string) { double 'card string' }
-
-  describe '#initialize' do
-  end
 end

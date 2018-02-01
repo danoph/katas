@@ -19,12 +19,20 @@ class TexasHoldEmCardsValidator
   end
 end
 
+class TexasPlayerCardsFactory
+  def build(cards_string)
+    cards_string.split(' ').map {|card_string| Card.new(card_string) }
+  end
+end
+
 class TexasHoldEm
   VALID_NUMBER_OF_CARDS = 7
 
   def initialize(cards_string)
-    cards = cards_string.split(' ').map {|card_string| card = Card.new(card_string) }
+    cards_factory = TexasPlayerCardsFactory.new
     cards_validator = TexasHoldEmCardsValidator.new
+
+    cards = cards_factory.build(cards_string)
     cards_validator.validate(cards)
   end
 
