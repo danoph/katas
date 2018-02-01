@@ -76,7 +76,7 @@ class TexasHoldEm
         "Four of a Kind (#{ high_card_rank } high)"
       elsif triplets.length >= 1
         high_card_rank = get_high_card_rank(triplets)
-        
+
         full_house_pairs = find_pairs(ranks - [high_card_rank])
 
         if full_house_pairs.length >= 1
@@ -90,7 +90,7 @@ class TexasHoldEm
         elsif pairs.length == 2
           "Two Pair (#{ pairs.max } high)"
         else
-          "High Card (#{ high_value(ranks) } high)"
+          "High Card (#{ get_high_card_rank(@cards) } high)"
         end
       end
     end
