@@ -49,7 +49,7 @@ class TexasHoldEm
     end
 
     pairs = find_pairs(ranks)
-    triplets = find_triplets(ranks)
+    triplets = find_triplets
     quads = find_quads
     flush = find_flush(suits)
     straight = find_straight(ranks)
@@ -71,14 +71,18 @@ class TexasHoldEm
       if straight
         "Straight (#{ straight } high)"
       elsif quads.length == 4
-        high_card = get_rank(quads[0])
-        "Four of a Kind (#{ high_card } high)"
+        high_card_rank = get_high_card_rank(quads)
+
+        "Four of a Kind (#{ high_card_rank } high)"
       elsif triplets.length >= 1
-        full_house_pairs = find_pairs(ranks - [triplets.max])
+        high_card_rank = get_high_card_rank(triplets)
+        
+        full_house_pairs = find_pairs(ranks - [high_card_rank])
+
         if full_house_pairs.length >= 1
-          "Full House (#{ triplets.max } high)"
+          "Full House (#{ high_card_rank } high)"
         else
-          "Three of a Kind (#{ triplets.max } high)"
+          "Three of a Kind (#{ high_card_rank } high)"
         end
       else
         if pairs.length == 1
@@ -94,6 +98,14 @@ class TexasHoldEm
 
   private
 
+  def get_high_card_rank(cards)
+    get_rank(get_high_card(cards))
+  end
+
+  def get_high_card(cards)
+    cards.sort{|card1, card2| @ranks.find_index(get_rank(card1)) <=> @ranks.find_index(get_rank(card2)) }[-1]
+  end
+
   def high_value(ranks)
     # create array of index locations of each ranks within the @ranks list
     rank1 = ranks.map{|e| @ranks.find_index(e) }
@@ -104,8 +116,8 @@ class TexasHoldEm
     ranks.select{|rank| ranks.count(rank) >= 2 }.uniq
   end
 
-  def find_triplets(ranks)
-    ranks.select{|rank| ranks.count(rank) == 3 }.uniq
+  def find_triplets
+    @cards.select{|card| @card_ranks.count(get_rank(card)) == 3 }
   end
 
   def find_quads
@@ -159,4 +171,5 @@ class TexasHoldEm
   def get_suit(card)
     card[-1]
   end
+
 end
