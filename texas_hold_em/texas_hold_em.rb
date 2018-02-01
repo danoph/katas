@@ -36,6 +36,8 @@ class TexasHoldEm
 
     card_validator = CardValidator.new(@cards)
     card_validator.validate
+
+    @card_ranks = @cards.map{|card| get_rank(card) }
   end
 
   def best_hand
@@ -48,7 +50,7 @@ class TexasHoldEm
 
     pairs = find_pairs(ranks)
     triplets = find_triplets(ranks)
-    quads = find_quads(ranks)
+    quads = find_quads
     flush = find_flush(suits)
     straight = find_straight(ranks)
 
@@ -68,8 +70,9 @@ class TexasHoldEm
     else
       if straight
         "Straight (#{ straight } high)"
-      elsif quads.length == 1
-        "Four of a Kind (#{ quads.max } high)"
+      elsif quads.length == 4
+        high_card = get_rank(quads[0])
+        "Four of a Kind (#{ high_card } high)"
       elsif triplets.length >= 1
         full_house_pairs = find_pairs(ranks - [triplets.max])
         if full_house_pairs.length >= 1
@@ -105,8 +108,8 @@ class TexasHoldEm
     ranks.select{|rank| ranks.count(rank) == 3 }.uniq
   end
 
-  def find_quads(ranks)
-    ranks.select{|rank| ranks.count(rank) == 4 }.uniq
+  def find_quads
+    @cards.select{|card| @card_ranks.count(get_rank(card)) == 4 }
   end
 
   def find_flush(suits)
