@@ -25,6 +25,12 @@ class HandsFinder
   end
 end
 
+class BestHandFinder
+  def initialize(hands)
+    @hands = hands
+  end
+end
+
 class TexasPlayerCardsFactory
   def build(cards_string)
     cards_string.split(' ').map {|card_string| Card.new(card_string) }
@@ -45,7 +51,9 @@ class TexasHoldEm
   def best_hand
     hands_finder = HandsFinder.new(@cards)
 
-    best_hand = hands_finder.all_hands[0]
+    best_hand_finder = BestHandFinder.new(hands_finder.all_hands)
+
+    best_hand = best_hand_finder.best_hand
 
     "#{best_hand.description} (#{best_hand.high_card} high)"
   end

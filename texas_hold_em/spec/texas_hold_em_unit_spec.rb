@@ -113,6 +113,8 @@ describe TexasHoldEm do
   let(:two_of_a_kind_hand) { double 'two of a kind hand', description: 'two of a kind description', high_card: two_of_a_kind_hand_high_card }
   let(:two_of_a_kind_hand_high_card) { '2' }
 
+  let(:best_hand_finder) { double 'best hand finder' }
+
   before do
     allow(TexasPlayerCardsFactory).to receive(:new) { cards_factory }
     allow(TexasHoldEmCardsValidator).to receive(:new) { cards_validator }
@@ -121,12 +123,16 @@ describe TexasHoldEm do
     allow(cards_validator).to receive(:validate).with(cards) { true }
 
     allow(HandsFinder).to receive(:new).with(cards) { hands_finder }
+
+    allow(BestHandFinder).to receive(:new).with(all_hands) { best_hand_finder }
   end
 
   describe '#best_hand' do
     context 'when there is two of a kind' do
       it 'returns best hand string from two of a kind hand object' do
         expect(hands_finder).to receive(:all_hands) { all_hands }
+        expect(best_hand_finder).to receive(:best_hand) { two_of_a_kind_hand }
+
         expect(subject.best_hand).to eq("#{two_of_a_kind_hand.description} (#{two_of_a_kind_hand.high_card} high)")
       end
     end
