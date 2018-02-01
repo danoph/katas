@@ -9,8 +9,7 @@ require_relative '../texas_hold_em'
     #let(:card_string2) { 'JD' }
     #let(:cards_string) { [ card_string1, card_string2 ].join(' ') }
 
-    #let(:cards) { [ two_of_clubs, jack_of_diamonds ] }
-    #let(:two_of_clubs) { double 'two of clubs' }
+    #let(:cards) { [ two_of_clubs, jack_of_diamonds ] } let(:two_of_clubs) { double 'two of clubs' }
     #let(:jack_of_diamonds) { double 'jack of diamonds' }
 
     #it 'returns a bunch of cards' do

@@ -1,5 +1,6 @@
 require './card'
 require './texas_hold_em_card_validator'
+require './hands_finder'
 
 class TexasHoldEmCardsValidator
   VALID_NUMBER_OF_CARDS = 7
@@ -16,12 +17,6 @@ class TexasHoldEmCardsValidator
     cards.each do |card|
       raise ArgumentError, "Should not accept #{ card }" unless @card_validator.valid_card?(card)
     end
-  end
-end
-
-class HandsFinder
-  def initialize(cards)
-    @cards = cards
   end
 end
 
