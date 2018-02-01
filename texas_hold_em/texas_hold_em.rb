@@ -42,13 +42,6 @@ class TexasHoldEm
   end
 
   def best_hand
-    ranks = []
-    suits = []
-    @cards.each do |card|
-      ranks << get_rank(card)
-      suits << get_suit(card)
-    end
-
     pairs = find_pairs
     triplets = find_triplets
     quads = find_quads
@@ -56,7 +49,6 @@ class TexasHoldEm
     straight = find_straight
 
     if flush.length >= 1
-      # flush_ranks = flush.map{|card| get_rank(card) }
       straight_flush = find_straight_from_cards(flush)
 
       if straight_flush.length >= 1
@@ -108,18 +100,12 @@ class TexasHoldEm
     cards.sort{|card1, card2| @ranks.find_index(get_rank(card1)) <=> @ranks.find_index(get_rank(card2)) }[-1]
   end
 
-  def high_value(ranks)
-    # create array of index locations of each ranks within the @ranks list
-    rank1 = ranks.map{|e| @ranks.find_index(e) }
-    @ranks[rank1.max]
-  end
-
   def find_pairs
     find_pairs_from_cards(@cards)
   end
 
   def find_pairs_from_cards(cards)
-    cards.select{|card|  @card_ranks.count(get_rank(card)) >= 2 }
+    cards.select{|card| @card_ranks.count(get_rank(card)) >= 2 }
   end
 
   def find_triplets
