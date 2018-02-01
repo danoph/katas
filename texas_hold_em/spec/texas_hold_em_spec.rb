@@ -1,46 +1,11 @@
 require 'test/unit'
-require './texas_hold_em'
+require_relative '../texas_hold_em'
 
-describe Card do
-  subject { described_class.new card_string }
-
-  context 'valid card string' do
-    let(:card_string) { 'KD' }
-
-    describe '#rank' do
-      it 'returns correct rank' do
-        expect(subject.rank).to eq('K')
-      end
-    end
-
-    describe '#suit' do
-      it 'returns correct suit' do
-        expect(subject.suit).to eq('D')
-      end
-    end
-  end
+# unit tests
+describe TexasHoldEm do
 end
 
-describe TexasHoldEmCardValidator do
-  describe '#valid_card?' do
-    context 'valid card' do
-      let(:card) { Card.new('KD') }
-
-      it 'returns true' do
-        expect(subject.valid_card?(card)).to eq(true)
-      end
-    end
-
-    context 'invalid card' do
-      let(:card) { Card.new('2J') }
-
-      it 'returns true' do
-        expect(subject.valid_card?(card)).to eq(false)
-      end
-    end
-  end
-end
-
+# integration tests
 describe TexasHoldEm do
   subject { described_class.new cards }
 
