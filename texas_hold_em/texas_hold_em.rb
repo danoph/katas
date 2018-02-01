@@ -38,6 +38,7 @@ class TexasHoldEm
     card_validator.validate
 
     @card_ranks = @cards.map{|card| get_rank(card) }
+    @card_suits = @cards.map{|card| get_suit(card) }
   end
 
   def best_hand
@@ -51,11 +52,11 @@ class TexasHoldEm
     pairs = find_pairs(ranks)
     triplets = find_triplets
     quads = find_quads
-    flush = find_flush(suits)
+    flush = find_flush
     straight = find_straight(ranks)
 
-    if flush.length == 1
-      flush_ranks = find_flush_ranks(flush[0])
+    if flush.length >= 1
+      flush_ranks = flush.map{|card| get_rank(card) }
       straight_flush = find_straight(flush_ranks)
 
       if straight_flush
@@ -65,7 +66,7 @@ class TexasHoldEm
           "Straight Flush (#{ straight_flush } high)"
         end
       else
-        "Flush (#{ high_value(flush_ranks) } high)"
+        "Flush (#{ get_high_card_rank(flush) } high)"
       end
     else
       if straight
@@ -124,17 +125,8 @@ class TexasHoldEm
     @cards.select{|card| @card_ranks.count(get_rank(card)) == 4 }
   end
 
-  def find_flush(suits)
-    suits.select{|suit| suits.count(suit) >= 5 }.uniq
-  end
-
-  def find_flush_ranks(suit)
-    ranks = []
-    filtered_cards = @cards.select{|card| card[-1] == suit}
-    filtered_cards.each do |card|
-      ranks << card[0...-1]
-    end
-    ranks
+  def find_flush
+    @cards.select{|card| @card_suits.count(get_suit(card)) >= 5 }
   end
 
   def find_straight(ranks)
