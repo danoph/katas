@@ -16,5 +16,6 @@ class TexasHoldEm
 
     raise ArgumentError, "Should not accept more than 7 cards" if cards.length > VALID_NUMBER_OF_CARDS
     raise ArgumentError, "Should not accept fewer than 7 cards" if cards.length < VALID_NUMBER_OF_CARDS
+    raise ArgumentError, "Should not accept duplicated cards" if cards.length != cards.uniq.length
   end
 end
