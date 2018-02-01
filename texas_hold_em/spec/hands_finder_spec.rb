@@ -1,5 +1,27 @@
 require_relative '../hands_finder'
 
+describe TwoOfAKind do
+  subject { described_class.new cards }
+
+  let(:cards) { [ card1, card2, high_card ] }
+
+  let(:card1) { '1' }
+  let(:card2) { '2' }
+  let(:high_card) { '3' }
+
+  describe '#description' do
+    it 'returns string' do
+      expect(subject.description).to eq('Two of a Kind')
+    end
+  end
+
+  describe '#high_card' do
+    it 'returns highest card' do
+      expect(subject.high_card).to eq(high_card)
+    end
+  end
+end
+
 describe HandsFinder do
   subject { described_class.new cards }
 

@@ -110,7 +110,7 @@ describe TexasHoldEm do
   let(:hands_finder) { double 'hands finder' }
   let(:all_hands) { [ two_of_a_kind_hand ] }
   let(:two_of_a_kind_hand) { double 'two of a kind hand', description: 'two of a kind description', high_card: two_of_a_kind_hand_high_card }
-  let(:two_of_a_kind_hand_high_card) { '2' }
+  let(:two_of_a_kind_hand_high_card) { double 'card', rank: '2' }
 
   let(:best_hand_finder) { double 'best hand finder' }
 
@@ -132,7 +132,7 @@ describe TexasHoldEm do
         expect(hands_finder).to receive(:all_hands) { all_hands }
         expect(best_hand_finder).to receive(:best_hand) { two_of_a_kind_hand }
 
-        expect(subject.best_hand).to eq("#{two_of_a_kind_hand.description} (#{two_of_a_kind_hand.high_card} high)")
+        expect(subject.best_hand).to eq("#{two_of_a_kind_hand.description} (#{two_of_a_kind_hand.high_card.rank} high)")
       end
     end
   end

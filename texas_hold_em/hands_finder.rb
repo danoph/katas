@@ -2,6 +2,14 @@ class TwoOfAKind
   def initialize(cards)
     @cards = cards
   end
+
+  def description
+    'Two of a Kind'
+  end
+
+  def high_card
+    @cards.sort[-1]
+  end
 end
 
 class HandsFinder

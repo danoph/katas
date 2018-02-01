@@ -18,4 +18,18 @@ describe Card do
       end
     end
   end
+
+  #describe '<=>' do
+    #context 'other card is ace' do
+      #let(:other_card) { described_class.new 'AD' }
+
+      #it 'returns -1' do
+        #expect(subject < other_card).to eq(-1)
+      #end
+    #end
+
+    #context 'other card is queen' do
+      #let(:other_card) { described_class.new 'QH' }
+    #end
+  #end
 end

@@ -1,6 +1,7 @@
 require './card'
 require './texas_hold_em_card_validator'
 require './hands_finder'
+require './best_hand_finder'
 
 class TexasHoldEmCardsValidator
   VALID_NUMBER_OF_CARDS = 7
@@ -17,12 +18,6 @@ class TexasHoldEmCardsValidator
     cards.each do |card|
       raise ArgumentError, "Should not accept #{ card }" unless @card_validator.valid_card?(card)
     end
-  end
-end
-
-class BestHandFinder
-  def initialize(hands)
-    @hands = hands
   end
 end
 
@@ -50,6 +45,6 @@ class TexasHoldEm
 
     best_hand = best_hand_finder.best_hand
 
-    "#{best_hand.description} (#{best_hand.high_card} high)"
+    "#{best_hand.description} (#{best_hand.high_card.rank} high)"
   end
 end

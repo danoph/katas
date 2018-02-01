@@ -18,4 +18,14 @@ class Card
   def eql?(other_card)
     other_card.rank == rank && other_card.suit == suit
   end
+
+  def <=>(other_card)
+    if rank > other_card.rank
+      1
+    elsif other_card.rank > rank
+      -1
+    else
+      0
+    end
+  end
 end
