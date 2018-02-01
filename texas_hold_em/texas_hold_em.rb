@@ -1,9 +1,11 @@
-class TexasHoldEm
+class CardValidator
   def initialize(cards)
-    @cards = cards.split(' ')
+    @cards = cards
     @ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
     @suits = ['H','C','S','D']
+  end
 
+  def validate
     if @cards.length > 7
       raise(ArgumentError, 'Should not accept more than 7 cards')
     elsif @cards.length < 7
@@ -14,7 +16,26 @@ class TexasHoldEm
       raise(ArgumentError, 'Should not accept duplicated cards')
     end
 
-    validate_cards
+    valid_cards = @suits.map do |suit|
+      @ranks.map{|rank| "#{ rank }#{ suit }" }
+    end.flatten
+
+    @cards.each do |card|
+      unless valid_cards.find{|valid_card| card == valid_card }
+        raise ArgumentError, "Should not accept #{ card }"
+      end
+    end
+  end
+end
+
+class TexasHoldEm
+  def initialize(cards)
+    @cards = cards.split(' ')
+    @ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
+    @suits = ['H','C','S','D']
+
+    card_validator = CardValidator.new(@cards)
+    card_validator.validate
   end
 
   def best_hand
@@ -69,18 +90,6 @@ class TexasHoldEm
   end
 
   private
-
-  def validate_cards
-    valid_cards = @suits.map do |suit|
-      @ranks.map{|rank| "#{ rank }#{ suit }" }
-    end.flatten
-
-    @cards.each do |card|
-      unless valid_cards.find{|valid_card| card == valid_card }
-        raise ArgumentError, "Should not accept #{ card }"
-      end
-    end
-  end
 
   def high_value(ranks)
     # create array of index locations of each ranks within the @ranks list
