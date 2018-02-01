@@ -19,6 +19,12 @@ class TexasHoldEmCardsValidator
   end
 end
 
+class HandsFinder
+  def initialize(cards)
+    @cards = cards
+  end
+end
+
 class TexasPlayerCardsFactory
   def build(cards_string)
     cards_string.split(' ').map {|card_string| Card.new(card_string) }
@@ -32,10 +38,15 @@ class TexasHoldEm
     cards_factory = TexasPlayerCardsFactory.new
     cards_validator = TexasHoldEmCardsValidator.new
 
-    cards = cards_factory.build(cards_string)
-    cards_validator.validate(cards)
+    @cards = cards_factory.build(cards_string)
+    cards_validator.validate(@cards)
   end
 
   def best_hand
+    hands_finder = HandsFinder.new(@cards)
+
+    best_hand = hands_finder.all_hands[0]
+
+    "#{best_hand.description} (#{best_hand.high_card} high)"
   end
 end

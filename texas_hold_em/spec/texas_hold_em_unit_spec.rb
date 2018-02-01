@@ -99,7 +99,46 @@ describe TexasPlayerCardsFactory do
 end
 
 describe TexasHoldEm do
-  subject { described_class.new card_string }
+  subject { described_class.new cards_string }
 
-  let(:card_string) { double 'card string' }
+  let(:cards_string) { double 'cards string' }
+
+  let(:cards_validator) { double 'cards validator' }
+
+  let(:cards_factory) { double 'cards factory' }
+  let(:cards) { double 'cards' }
+
+  let(:hands_finder) { double 'hands finder' }
+  let(:all_hands) { [ two_of_a_kind_hand ] }
+  let(:two_of_a_kind_hand) { double 'two of a kind hand', description: 'two of a kind description', high_card: two_of_a_kind_hand_high_card }
+  let(:two_of_a_kind_hand_high_card) { '2' }
+
+  before do
+    allow(TexasPlayerCardsFactory).to receive(:new) { cards_factory }
+    allow(TexasHoldEmCardsValidator).to receive(:new) { cards_validator }
+
+    allow(cards_factory).to receive(:build).with(cards_string) { cards }
+    allow(cards_validator).to receive(:validate).with(cards) { true }
+
+    allow(HandsFinder).to receive(:new).with(cards) { hands_finder }
+  end
+
+  describe '#best_hand' do
+    context 'when there is two of a kind' do
+      it 'returns best hand string from two of a kind hand object' do
+        expect(hands_finder).to receive(:all_hands) { all_hands }
+        expect(subject.best_hand).to eq("#{two_of_a_kind_hand.description} (#{two_of_a_kind_hand.high_card} high)")
+      end
+    end
+  end
 end
+
+
+
+
+
+
+
+
+
+
