@@ -42,8 +42,8 @@ class TexasHoldEm
     ranks = []
     suits = []
     @cards.each do |card|
-      ranks << card[0...-1]
-      suits << card[-1]
+      ranks << get_rank(card)
+      suits << get_suit(card)
     end
 
     pairs = find_pairs(ranks)
@@ -147,5 +147,13 @@ class TexasHoldEm
     else
       nil
     end
+  end
+
+  def get_rank(card)
+    card[0...-1]
+  end
+
+  def get_suit(card)
+    card[-1]
   end
 end
