@@ -1,3 +1,12 @@
+class TexasHoldEmCardValidator
+  VALID_RANKS = %w(2 3 4 5 6 7 8 9 10 J Q K A)
+  VALID_SUITS = %w(D C S H)
+
+  def valid_card?(card)
+    VALID_RANKS.include?(card.rank) && VALID_SUITS.include?(card.suit)
+  end
+end
+
 class Card
   attr_reader :rank, :suit
 
@@ -21,18 +30,15 @@ class Card
 end
 
 class TexasHoldEm
-  VALID_RANKS = %w(2 3 4 5 6 7 8 9 10 J Q K A)
-  VALID_SUITS = %w(D C S H)
-
   VALID_NUMBER_OF_CARDS = 7
 
   def initialize(cards_string)
-    cards = cards_string.split(' ').map{|card_string| Card.new(card_string) }
+    card_validator = TexasHoldEmCardValidator.new
 
-    cards.each do |card|
-      unless VALID_RANKS.include?(card.rank) && VALID_SUITS.include?(card.suit)
-        raise ArgumentError, "Should not accept #{ card }"
-      end
+    cards = cards_string.split(' ').map do |card_string|
+      card = Card.new(card_string)
+      raise ArgumentError, "Should not accept #{ card }" unless card_validator.valid_card?(card)
+      card
     end
 
     raise ArgumentError, "Should not accept more than 7 cards" if cards.length > VALID_NUMBER_OF_CARDS
