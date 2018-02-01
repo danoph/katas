@@ -53,24 +53,25 @@ class TexasHoldEm
     triplets = find_triplets
     quads = find_quads
     flush = find_flush
-    straight = find_straight(ranks)
+    straight = find_straight
 
     if flush.length >= 1
-      flush_ranks = flush.map{|card| get_rank(card) }
-      straight_flush = find_straight(flush_ranks)
+      # flush_ranks = flush.map{|card| get_rank(card) }
+      straight_flush = find_straight_from_cards(flush)
 
-      if straight_flush
-        if straight_flush == 'A'
-          "Royal Flush (#{ straight_flush } high)"
+      if straight_flush.length >= 1
+        high_card_rank = get_high_card_rank(straight_flush)
+        if high_card_rank == 'A'
+          "Royal Flush (#{ high_card_rank } high)"
         else
-          "Straight Flush (#{ straight_flush } high)"
+          "Straight Flush (#{ high_card_rank } high)"
         end
       else
         "Flush (#{ get_high_card_rank(flush) } high)"
       end
     else
-      if straight
-        "Straight (#{ straight } high)"
+      if straight.length >= 1
+        "Straight (#{ get_high_card_rank(straight) } high)"
       elsif quads.length == 4
         high_card_rank = get_high_card_rank(quads)
 
@@ -133,30 +134,37 @@ class TexasHoldEm
     @cards.select{|card| @card_suits.count(get_suit(card)) >= 5 }
   end
 
-  def find_straight(ranks)
+  def find_straight
+    find_straight_from_cards(@cards)
+  end
+
+  def find_straight_from_cards(cards)
     previous_rank = nil
-    straight_rank = []
-    ordered_ranks = ranks.map{|e| @ranks.find_index(e) }.sort
-    ordered_ranks.each do |rank|
+    straight_rank_indexes = []
+    card_ranks = cards.map{|card| get_rank(card) }
+    ordered_rank_indexes = card_ranks.map{|e| @ranks.find_index(e) }.sort
+    ordered_rank_indexes.each do |rank_index|
       if !previous_rank
-        straight_rank << rank
+        straight_rank_indexes << rank_index
       else
-        if previous_rank + 1 == rank
-          straight_rank << rank
+        if previous_rank + 1 == rank_index
+          straight_rank_indexes << rank_index
         else
-          if straight_rank.length < 5
-            straight_rank = []
+          if straight_rank_indexes.length < 5
+            straight_rank_indexes = []
           end
         end
       end
-      previous_rank = rank
+      previous_rank = rank_index
     end
 
-    if straight_rank.length >= 5
-      straight_rank[-5]
-      @ranks[straight_rank.max]
+    if straight_rank_indexes.length >= 5
+      cards.select do |card|
+        card_index = @ranks.find_index(get_rank(card))
+        straight_rank_indexes.include?(card_index)
+      end
     else
-      nil
+      []
     end
   end
 
