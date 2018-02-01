@@ -49,7 +49,7 @@ class TexasHoldEm
       suits << get_suit(card)
     end
 
-    pairs = find_pairs(ranks)
+    pairs = find_pairs
     triplets = find_triplets
     quads = find_quads
     flush = find_flush
@@ -77,19 +77,19 @@ class TexasHoldEm
         "Four of a Kind (#{ high_card_rank } high)"
       elsif triplets.length >= 1
         high_card_rank = get_high_card_rank(triplets)
+        cards_without_high_triplets = @cards.reject{|card| get_rank(card) == high_card_rank }
+        full_house_pairs = find_pairs_from_cards(cards_without_high_triplets)
 
-        full_house_pairs = find_pairs(ranks - [high_card_rank])
-
-        if full_house_pairs.length >= 1
+        if full_house_pairs.length >= 2
           "Full House (#{ high_card_rank } high)"
         else
           "Three of a Kind (#{ high_card_rank } high)"
         end
       else
-        if pairs.length == 1
-          "Two of a Kind (#{ pairs[0] } high)"
-        elsif pairs.length == 2
-          "Two Pair (#{ pairs.max } high)"
+        if pairs.length == 2
+          "Two of a Kind (#{ get_high_card_rank(pairs) } high)"
+        elsif pairs.length >= 4
+          "Two Pair (#{ get_high_card_rank(pairs) } high)"
         else
           "High Card (#{ get_high_card_rank(@cards) } high)"
         end
@@ -113,8 +113,12 @@ class TexasHoldEm
     @ranks[rank1.max]
   end
 
-  def find_pairs(ranks)
-    ranks.select{|rank| ranks.count(rank) >= 2 }.uniq
+  def find_pairs
+    find_pairs_from_cards(@cards)
+  end
+
+  def find_pairs_from_cards(cards)
+    cards.select{|card|  @card_ranks.count(get_rank(card)) >= 2 }
   end
 
   def find_triplets
