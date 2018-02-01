@@ -10,6 +10,14 @@ class Card
   def to_s
     @card_string
   end
+
+  def hash
+    @card_string.hash
+  end
+
+  def eql?(other_card)
+    other_card.rank == rank && other_card.suit == suit
+  end
 end
 
 class TexasHoldEm
@@ -19,11 +27,9 @@ class TexasHoldEm
   VALID_NUMBER_OF_CARDS = 7
 
   def initialize(cards_string)
-    cards = cards_string.split ' '
+    cards = cards_string.split(' ').map{|card_string| Card.new(card_string) }
 
-    cards.each do |card_string|
-      card = Card.new(card_string)
-
+    cards.each do |card|
       unless VALID_RANKS.include?(card.rank) && VALID_SUITS.include?(card.suit)
         raise ArgumentError, "Should not accept #{ card }"
       end
