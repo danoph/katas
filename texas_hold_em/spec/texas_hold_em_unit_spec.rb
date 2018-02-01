@@ -56,6 +56,20 @@ describe TexasHoldEmCardsValidator do
         expect { subject.validate(cards) }.to raise_error(ArgumentError, "Should not accept duplicated cards")
       end
     end
+
+    context 'when a bad card is passed in' do
+      let(:cards) { [ card1, card2, card3, card4, card5, card6, card7 ] }
+      let(:card_validator) { double 'card validator', valid_card?: true }
+
+      before do
+        allow(TexasHoldEmCardValidator).to receive(:new) { card_validator }
+        allow(card_validator).to receive(:valid_card?).with(card3) { false }
+      end
+
+      it 'raises error' do
+        expect { subject.validate(cards) }.to raise_error(ArgumentError, "Should not accept #{card3}")
+      end
+    end
   end
 end
 
