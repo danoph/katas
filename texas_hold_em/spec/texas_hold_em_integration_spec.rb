@@ -1,10 +1,6 @@
 require 'test/unit'
 require_relative '../texas_hold_em'
 
-# unit tests
-describe TexasHoldEm do
-end
-
 # integration tests
 describe TexasHoldEm do
   subject { described_class.new cards }
